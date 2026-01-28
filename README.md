@@ -98,7 +98,7 @@ Real-time updates are handled using WebSockets.
 
 **File Structure**
 ```txt
-dementia-context-aware-assistant/
+reminiscence/
 ├── backend/
 │   ├── app/
 │   │   ├── api/                # REST & WebSocket endpoints
