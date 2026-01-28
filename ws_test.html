@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Alert Test</title>
+  </head>
+  <body>
+    <h2>Caregiver Alert Console</h2>
+
+    <script>
+      const ws = new WebSocket("ws://127.0.0.1:8000/ws/alerts");
+
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+      };
+
+      ws.onmessage = (event) => {
+        console.log("ALERT RECEIVED:", event.data);
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+    </script>
+  </body>
+</html>
