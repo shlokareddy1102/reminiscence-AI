@@ -156,6 +156,28 @@ This model ensures:
   - Tasks and reminders  
   - Interaction logs  
   - Alert history  
+### AI/ML Components
+### 1. Facial Recognition (OpenCV + Face Recognition Library)
+### Detection Models:
+  ### MediaPipe Face Detection :
+  -Lightweight, CPU-optimized
+  -Real-time performance for one-on-one interactions
+  ### YOLOv8n :
+  -Robust multi-face detection
+  -Handles group gatherings, varying distances, partial occlusion
+### Recognition Model:
+  ### InsightFace (ArcFace) - Face identification
+  -512-dimensional embeddings
+  -98%+ accuracy on standard benchmarks
+  -Works with both detection pathways
+### 2.RAG (Retrieval Augmented Generation) System 🧠:
+-Temporal Awareness: Prioritizes recent conversations (weighted by recency)
+-Relationship Context: Understands family relationships and their significance
+- Plan Extraction: Automatically identifies upcoming meetings, appointments, promises
+- Emotion-Aware: Detects important emotional topics (health concerns, celebrations)
+- Multi-Person Conversations: Tracks group discussions and who said what
+- Privacy-Preserving: Embeddings are anonymized; original audio can be deleted
+
 
 ### AI Layer
 - AI agent for decision-making
