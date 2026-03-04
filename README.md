@@ -1,6 +1,96 @@
 # reminiscence.ai 
 ## Context-Aware Dementia Assistance Web Application
 
+![Stack](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+
+---
+
+## 🚀 Quick Start for New Users
+
+### Prerequisites
+Before running this project, ensure you have:
+1. **Node.js** (v18 or higher): [Download here](https://nodejs.org/)
+2. **MongoDB** (v6 or higher): [Installation guide](https://www.mongodb.com/docs/manual/installation/)
+3. **Python** (3.9-3.11 recommended): Usually pre-installed on Mac/Linux, [Windows download](https://www.python.org/downloads/)
+
+### Installation Steps
+
+```bash
+# 1. Clone this repository
+git clone https://github.com/shlokareddy1102/reminiscence.ai.git
+cd reminiscence.ai
+
+# 2. Make sure MongoDB is running
+# macOS (using Homebrew):
+brew services start mongodb-community
+
+# Linux:
+sudo systemctl start mongod
+
+# Windows: MongoDB should auto-start as a service
+
+# 3. Run the automated setup script (recommended)
+chmod +x start.sh
+./start.sh
+```
+
+**That's it!** 🎉 The `start.sh` script will:
+- Install all Node.js dependencies
+- Create a Python virtual environment
+- Install Python packages (InsightFace, FAISS, OpenCV, Flask)
+- Seed demo data (patients, tasks, caregivers)
+- Start all three services (Backend, Python, Frontend)
+
+### Accessing the Application
+
+Once the services start, open your browser to: **http://localhost:5173**
+
+**Demo Login Credentials:**
+- **Caregiver Dashboard**: `caregiver@test.com` / `password123`
+- **Patient Dashboard**: `patient@test.com` / `password123`
+
+### Services & Ports
+
+| Service | Port | Status Check |
+|---------|------|--------------|
+| React Frontend | 5173 | http://localhost:5173 |
+| Node.js Backend | 5001 | http://localhost:5001/health |
+| Python Face Service | 5002 | http://localhost:5002/health |
+| MongoDB | 27017 | `mongosh` command |
+
+### Testing Face Recognition
+
+1. Log in as **Caregiver** → Navigate to "Add Known Person"
+2. Upload a clear frontal face photo (good lighting, no glasses)
+3. Fill in name and relationship → Click "Add Person"
+4. Log in as **Patient** (in incognito/another browser)
+5. Click "Recognize Someone" → Position your face in camera
+6. System will recognize you and speak your name! 🎤
+
+### Troubleshooting
+
+If something goes wrong:
+
+```bash
+# Check if MongoDB is running
+brew services list  # macOS
+sudo systemctl status mongod  # Linux
+
+# Restart all services (kill existing processes)
+lsof -ti TCP:5001 | xargs kill -9
+lsof -ti TCP:5002 | xargs kill -9
+lsof -ti TCP:5173 | xargs kill -9
+
+# Run setup again
+./start.sh
+```
+
+For detailed setup instructions, configuration options, and troubleshooting, see **[SETUP.md](SETUP.md)**.
+
 ---
 
 ## 1. Overview
@@ -9,7 +99,7 @@ reminiscence.ai is a **context-aware dementia assistance web application** desig
 
 Unlike traditional reminder or productivity applications that rely on active user interaction, reminiscence.ai is designed to operate in a **passive, always-on manner**, reducing the cognitive burden on patients. The system observes context, provides timely reminders and reassurance, and escalates situations to caregivers when required.
 
-The project is implemented as a **web application using the MERN stack**, enhanced with an **AI decision-making agent** and **Large Language Models (LLMs)** for intelligent behavior and natural language interaction.
+The project is implemented as a **web application using the MERN stack**, enhanced with **production-grade face recognition** (InsightFace + FAISS) and **real-time monitoring** capabilities.
 
 ---
 
@@ -141,54 +231,142 @@ This model ensures:
 ## 9. Tech Stack
 
 ### Frontend
-- React.js
-- HTML, CSS, JavaScript
-- Progressive Web App (PWA) principles
+- **React** 18.3.1 with Vite 5.4.21
+- **Tailwind CSS** 3.4.17 for styling
+- **MediaPipe Tasks Vision** 0.10.14 (BlazeFace detection)
+- **react-webcam** 7.2.0 for camera access
+- **Socket.io-client** 4.8.3 for real-time updates
+- Web Speech API for voice commands
 
 ### Backend
-- Node.js
-- Express.js
-- REST APIs
+- **Node.js** 25.6.0 with Express 5.2.1
+- **MongoDB** with Mongoose 9.2.4
+- **Socket.io** 4.8.3 for WebSocket communication
+- **Multer** 2.1.0 for file uploads
+- REST APIs for all operations
 
-### Database
-- MongoDB  
-  - User profiles  
-  - Tasks and reminders  
-  - Interaction logs  
-  - Alert history  
+### Database (MongoDB)
+- **Patient** profiles and demographics
+- **Tasks** with scheduling and deadlines
+- **Events** and activity logs
+- **Alerts** for caregivers
+- **KnownPerson** with face embeddings
+- Real-time monitoring and risk scoring
+
 ### AI/ML Components
-### 1. Facial Recognition (OpenCV + Face Recognition Library)
-### Detection Models:
-  ### MediaPipe Face Detection :
-  - Lightweight, CPU-optimized
-  - Real-time performance for one-on-one interactions
-  ### YOLOv8n :
-  - Robust multi-face detection
-  - Handles group gatherings, varying distances, partial occlusion
-### Recognition Model:
-  ### InsightFace (ArcFace) - Face identification
-  - 512-dimensional embeddings
-  - 98%+ accuracy on standard benchmarks
-  - Works with both detection pathways
-### 2.RAG (Retrieval Augmented Generation) System 🧠:
-- Temporal Awareness: Prioritizes recent conversations (weighted by recency)
-- Relationship Context: Understands family relationships and their significance
-- Plan Extraction: Automatically identifies upcoming meetings, appointments, promises
-- Emotion-Aware: Detects important emotional topics (health concerns, celebrations)
-- Multi-Person Conversations: Tracks group discussions and who said what
-- Privacy-Preserving: Embeddings are anonymized; original audio can be deleted
 
+#### Face Recognition Pipeline
+1. **Detection**: MediaPipe BlazeFace (browser-based)
+   - Lightweight, CPU-optimized
+   - Real-time face detection in webcam feed
+   - Bounding box extraction
 
-### AI Layer
-- AI agent for decision-making
-- Large Language Models for natural language generation
+2. **Recognition**: InsightFace + FAISS (Python microservice)
+   - **InsightFace** (ArcFace model): 512-dimensional embeddings
+   - **FAISS** IndexFlatL2: L2 distance vector search
+   - 98%+ accuracy on standard benchmarks
+   - Face matching threshold: 1.2 (L2 distance)
+
+3. **Tracking**: SimpleTracker
+   - Stable track IDs across frames
+   - IoU (Intersection over Union) matching
+   - 85px center-distance threshold
+
+#### Python Microservice
+- **Flask** 3.1.3 API server
+- **InsightFace** 0.7.3: buffalo_l model
+- **FAISS** 1.13.2: Vector similarity search
+- **OpenCV** 4.13.0: Image processing
+- **NumPy** 2.4.2: Array operations
+- **onnxruntime** 1.24.2: Model inference
+
+#### Background Services
+- **Monitoring Service**: 30-second interval task checking
+- **Risk Engine**: 4-state machine (STABLE → MILD → ELEVATED → CRITICAL)
+- **Bootstrap Service**: Demo data seeding
 
 ### Real-Time Communication
-- WebSockets
+- **Socket.io**: Bidirectional event-based communication
+- Events: alerts, task updates, recognition notifications, risk changes
 
 ---
 
-## 10. Scope of the Project
+## 10. Project Structure
+
+```
+reminiscence.ai/
+├── client/                          # React frontend (Vite)
+│   ├── src/
+│   │   ├── patient/                 # Patient dashboard
+│   │   │   ├── PatientScreen.jsx    # Main patient UI with face recognition
+│   │   │   └── tracker.js           # SimpleTracker for face tracking
+│   │   ├── caregiver/               # Caregiver dashboard
+│   │   │   └── CaregiverDashboard.jsx
+│   │   ├── api.js                   # Axios API client
+│   │   └── App.jsx                  # Root component with routing
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/                          # Node.js backend (Express)
+│   ├── models/                      # Mongoose schemas
+│   │   ├── Patient.js               # Patient demographics & risk scores
+│   │   ├── Task.js                  # Task scheduling & deadlines
+│   │   ├── Event.js                 # Activity event logging
+│   │   ├── Alert.js                 # Caregiver alerts
+│   │   ├── ActivityLog.js           # Detailed activity logs
+│   │   ├── KnownPerson.js           # Known people with photos
+│   │   └── User.js                  # Authentication
+│   ├── routes/                      # Express route handlers
+│   │   ├── patient.js               # Patient CRUD operations
+│   │   ├── tasks.js                 # Task management
+│   │   ├── knownPeople.js           # Face recognition API proxy
+│   │   ├── alerts.js                # Alert endpoints
+│   │   ├── events.js                # Event logging
+│   │   ├── activityLogs.js          # Activity log retrieval
+│   │   └── auth.js                  # Login/register
+│   ├── services/                    # Background services
+│   │   ├── monitoringService.js     # Task deadline checker (30s)
+│   │   ├── riskEngine.js            # Risk state machine
+│   │   └── bootstrapService.js      # Seed demo data
+│   ├── sockets/                     # Socket.io event handlers
+│   │   └── index.js                 # Real-time event broadcasting
+│   ├── python_service/              # Python face recognition
+│   │   ├── app.py                   # Flask server (port 5002)
+│   │   ├── face_engine.py           # InsightFace + FAISS engine
+│   │   ├── requirements.txt         # Python dependencies
+│   │   └── venv/                    # Virtual environment (auto-created)
+│   ├── uploads/                     # Known person photos
+│   ├── seed.js                      # Database seeding script
+│   └── server.js                    # Express app entry point
+│
+├── start.sh                         # One-command startup script
+├── SETUP.md                         # Detailed setup instructions
+├── README.md                        # This file
+├── package.json                     # Root dependencies
+└── .gitignore                       # Excludes node_modules, venv, etc.
+```
+
+### Key Files to Understand
+
+**Frontend:**
+- [client/src/patient/PatientScreen.jsx](client/src/patient/PatientScreen.jsx) - Main patient UI with face recognition, task overlay, voice commands
+- [client/src/patient/tracker.js](client/src/patient/tracker.js) - SimpleTracker for stable face track IDs
+- [client/src/caregiver/CaregiverDashboard.jsx](client/src/caregiver/CaregiverDashboard.jsx) - Caregiver management dashboard
+
+**Backend:**
+- [server/server.js](server/server.js) - Express app initialization, starts monitoring service
+- [server/routes/knownPeople.js](server/routes/knownPeople.js) - Face recognition API proxy to Python service
+- [server/services/monitoringService.js](server/services/monitoringService.js) - Background task monitoring (30s intervals)
+- [server/services/riskEngine.js](server/services/riskEngine.js) - Risk scoring state machine
+
+**Python Service:**
+- [server/python_service/app.py](server/python_service/app.py) - Flask API with /recognize, /rebuild-index endpoints
+- [server/python_service/face_engine.py](server/python_service/face_engine.py) - InsightFace + FAISS core logic
+
+---
+
+## 11. Scope of the Project
 
 - Designed for early to mid-stage dementia
 - Academic and demonstrative in nature
@@ -200,28 +378,236 @@ This model ensures:
 ## 11. Limitations
 
 - Browser-based sensing has inherent constraints
-- Face recognition and precise location tracking are conceptual or limited
-- LLM outputs are simplified and controlled
+- Face recognition accuracy depends on lighting and camera quality
+- Currently CPU-only (GPU acceleration available but not configured by default)
 - Hardware integration is minimal
+
+---
+
+## 11.5 Manual Setup (Alternative to start.sh)
+
+If you prefer to set up services manually instead of using the automated script:
+
+### Step 1: Install Node.js Dependencies
+
+```bash
+# Root dependencies
+npm install
+
+# Client dependencies
+cd client
+npm install
+cd ..
+```
+
+### Step 2: Set Up Python Environment
+
+```bash
+cd server/python_service
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install --upgrade pip
+pip install -r requirements.txt
+cd ../..
+```
+
+### Step 3: Seed Database
+
+```bash
+npm run seed
+```
+
+### Step 4: Start Services (3 separate terminals)
+
+**Terminal 1 - Python Face Service:**
+```bash
+cd server/python_service
+source venv/bin/activate
+python app.py
+```
+
+**Terminal 2 - Node.js Backend:**
+```bash
+npm run server
+```
+
+**Terminal 3 - React Frontend:**
+```bash
+cd client
+npm run dev
+```
+
+MongoDB must be running separately on port 27017.
+
+### Configuration Options
+
+Create a `.env` file in the project root (optional):
+
+```env
+# MongoDB
+MONGO_URI=mongodb://127.0.0.1:27017/reminiscence
+
+# Backend
+PORT=5001
+
+# Python Service
+PYTHON_SERVICE_URL=http://localhost:5002
+PYTHON_SERVICE_PORT=5002
+```
+
+### Adjust Face Recognition Threshold
+
+Edit `client/src/patient/PatientScreen.jsx` to change matching sensitivity:
+
+```javascript
+const response = await api.post('/api/known-people/recognize', {
+  image: imageBase64,
+  top_k: 1,
+  threshold: 1.2  // Lower = stricter (0.6-1.5 recommended)
+});
+```
+
+**Threshold recommendations:**
+- `0.6`: Very strict
+- `0.8`: Strict (good for controlled lighting)
+- `1.0`: Balanced
+- `1.2`: Lenient (default, works well for webcams)
+- `1.5`: Very lenient
+
+---
+
+## 11.6 Advanced Troubleshooting
+
+### Python Service Issues
+
+**Problem**: Python packages won't install
+```bash
+cd server/python_service
+source venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+```
+
+**Problem**: InsightFace model download fails (500MB+ model)
+- Be patient on first run - model downloads automatically
+- Check internet connection
+- Ensure sufficient disk space (~1GB free)
+
+**Problem**: FAISS not working on Apple Silicon (M1/M2)
+```bash
+# Use conda instead
+conda install -c conda-forge faiss-cpu
+```
+
+### MongoDB Connection Issues
+
+```bash
+# Check if MongoDB is running
+ps aux | grep mongod
+
+# Start MongoDB (macOS)
+brew services start mongodb-community
+
+# Start MongoDB (Linux)
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+### Port Conflicts
+
+```bash
+# Kill processes on specific ports
+lsof -ti TCP:5001 | xargs kill -9  # Backend
+lsof -ti TCP:5002 | xargs kill -9  # Python
+lsof -ti TCP:5173 | xargs kill -9  # Frontend
+```
+
+### Recognition Issues
+
+**Face not detected:**
+- Ensure good front-facing lighting
+- Position face directly toward camera
+- Check Python logs for "No face detected"
+
+**Face detected but not recognized:**
+- Check distance in Python logs (should be < 1.2)
+- Increase threshold to 1.5
+- Re-upload known person photo with better quality
+
+**Rebuild FAISS index manually:**
+```bash
+curl -X POST http://localhost:5002/rebuild-index
+```
 
 ---
 
 ## 12. Future Enhancements
 
-- Advanced computer vision for face recognition
-- Wearable sensor integration
-- Emotion-aware assistance
-- Multilingual support
-- More autonomous AI agent behavior
-- Offline-first capabilities
+- [ ] **Multi-photo per person**: Upload multiple photos per known person for better coverage under different conditions
+- [ ] **GPU Acceleration**: Use `faiss-gpu` and `onnxruntime-gpu` for 5-10x faster recognition
+- [ ] **Incremental FAISS updates**: Avoid full index rebuild on every upload
+- [ ] **JWT Authentication**: Enable token-based authentication (models already exist)
+- [ ] **Mobile responsive UI**: Optimize for tablet and mobile devices
+- [ ] **Audio reminders**: Text-to-speech for task reminders
+- [ ] **Weekly/monthly analytics**: Trend analysis for caregivers
+- [ ] **Medication inventory**: Track medication schedule and refills
+- [ ] **Multilingual support**: Support for multiple languages
+- [ ] **Emotion detection**: Facial expression analysis for distress detection
+- [ ] **Wearable integration**: Connect smart watches for activity monitoring
+- [ ] **Cloud deployment**: Docker containerization + AWS/GCP deployment
+- [ ] **Offline-first PWA**: Progressive Web App with offline capabilities
+- [ ] **RAG system**: Conversation tracking with retrieval augmented generation
 
 ---
 
-## 13. Conclusion
+## 13. Contributing
 
-reminiscence.ai demonstrates how **modern web technologies**, **AI agents**, and **Large Language Models** can be combined to build a realistic, ethical, and context-aware dementia assistance system.
+Contributions are welcome! To contribute:
+
+1. Fork this repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m "Add feature"`
+4. Push to branch: `git push origin feature-name`
+5. Submit a Pull Request
+
+### Development Guidelines
+
+- Follow existing code style (ESLint + Prettier configured)
+- Test face recognition with various lighting conditions
+- Update SETUP.md if adding new dependencies
+- Write descriptive commit messages
+
+---
+
+## 14. License
+
+This project is licensed under the **ISC License**.
+
+---
+
+## 15. Conclusion
+
+reminiscence.ai demonstrates how **modern web technologies**, **production-grade face recognition** (InsightFace + FAISS), and **real-time monitoring** can be combined to build a practical, ethical, and context-aware dementia assistance system.
 
 By transferring cognitive responsibility from the patient to the system, the project aims to improve safety, independence, and caregiver awareness in a scalable web-based solution.
 
----
+### Key Achievements
 
+✅ **Full-Stack MERN Architecture**: MongoDB, Express, React, Node.js with real-time Socket.io  
+✅ **Production Face Recognition**: InsightFace (512-dim ArcFace) + FAISS vector search  
+✅ **Background Monitoring**: Automated task checking every 30 seconds  
+✅ **Risk State Machine**: Dynamic 4-state scoring (STABLE → MILD → ELEVATED → CRITICAL)  
+✅ **Real-Time Alerts**: Instant caregiver notifications via WebSocket  
+✅ **Voice Interaction**: Speech recognition for hands-free task completion  
+✅ **Multi-Face Tracking**: Stable track IDs with IoU matching  
+✅ **One-Command Setup**: Automated installation script for rapid deployment  
+
+### Support & Documentation
+
+- **Setup Guide**: [SETUP.md](SETUP.md) for detailed installation
+- **GitHub Issues**: Report bugs or request features
+- **Demo Credentials**: `caregiver@test.com` / `password123`
+
+**Built with ❤️ for dementia care**
+
+---
