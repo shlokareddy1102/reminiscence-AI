@@ -91,6 +91,34 @@ lsof -ti TCP:5173 | xargs kill -9
 
 For detailed setup instructions, configuration options, and troubleshooting, see **[SETUP.md](SETUP.md)**.
 
+### Primary Frontend
+
+The active React frontend for this MERN app is `frontend_lovable/`.
+
+### Recommended Commands
+
+```bash
+# Install dependencies
+npm install
+npm --prefix frontend_lovable install
+
+# Run full stack in development mode (backend + primary React frontend)
+npm run dev
+
+# Run backend smoke checks (health + auth login)
+npm run smoke
+```
+
+### Production-Style Local Run
+
+```bash
+# Build frontend once
+npm run client:build
+
+# Start backend + preview frontend
+npm run start:full
+```
+
 ---
 
 ## 1. Overview
@@ -295,18 +323,15 @@ This model ensures:
 
 ```
 reminiscence.ai/
-├── client/                          # React frontend (Vite)
+├── frontend_lovable/                # React frontend (Vite)
 │   ├── src/
-│   │   ├── patient/                 # Patient dashboard
-│   │   │   ├── PatientScreen.jsx    # Main patient UI with face recognition
-│   │   │   └── tracker.js           # SimpleTracker for face tracking
-│   │   ├── caregiver/               # Caregiver dashboard
-│   │   │   └── CaregiverDashboard.jsx
-│   │   ├── api.js                   # Axios API client
+│   │   ├── pages/                   # Route pages
+│   │   │   ├── patient/PatientHome.jsx
+│   │   │   └── caregiver/CaregiverDashboard.jsx
+│   │   ├── lib/api.js               # API client
 │   │   └── App.jsx                  # Root component with routing
-│   ├── public/
 │   ├── package.json
-│   └── vite.config.js
+│   └── vite.config.ts
 │
 ├── server/                          # Node.js backend (Express)
 │   ├── models/                      # Mongoose schemas
@@ -350,9 +375,8 @@ reminiscence.ai/
 ### Key Files to Understand
 
 **Frontend:**
-- [client/src/patient/PatientScreen.jsx](client/src/patient/PatientScreen.jsx) - Main patient UI with face recognition, task overlay, voice commands
-- [client/src/patient/tracker.js](client/src/patient/tracker.js) - SimpleTracker for stable face track IDs
-- [client/src/caregiver/CaregiverDashboard.jsx](client/src/caregiver/CaregiverDashboard.jsx) - Caregiver management dashboard
+- [frontend_lovable/src/pages/patient/PatientHome.jsx](frontend_lovable/src/pages/patient/PatientHome.jsx) - Main patient UI
+- [frontend_lovable/src/pages/caregiver/CaregiverDashboard.jsx](frontend_lovable/src/pages/caregiver/CaregiverDashboard.jsx) - Caregiver management dashboard
 
 **Backend:**
 - [server/server.js](server/server.js) - Express app initialization, starts monitoring service
@@ -394,8 +418,8 @@ If you prefer to set up services manually instead of using the automated script:
 # Root dependencies
 npm install
 
-# Client dependencies
-cd client
+# Frontend dependencies
+cd frontend_lovable
 npm install
 cd ..
 ```
@@ -433,8 +457,7 @@ npm run server
 
 **Terminal 3 - React Frontend:**
 ```bash
-cd client
-npm run dev
+npm run client:dev
 ```
 
 MongoDB must be running separately on port 27017.
@@ -449,15 +472,30 @@ MONGO_URI=mongodb://127.0.0.1:27017/reminiscence
 
 # Backend
 PORT=5001
+CLIENT_ORIGIN=http://localhost:5173,http://localhost:8080
 
 # Python Service
 PYTHON_SERVICE_URL=http://localhost:5002
 PYTHON_SERVICE_PORT=5002
+
+# Frontend
+VITE_API_BASE_URL=http://localhost:5001
+```
+
+### Quick API Smoke Test
+
+```bash
+# Backend must already be running on http://localhost:5001
+npm run smoke
+
+# Optional custom credentials / API base URL
+SMOKE_EMAIL=caregiver@test.com SMOKE_PASSWORD=password123 npm run smoke
+SMOKE_API_BASE_URL=http://localhost:5001 npm run smoke
 ```
 
 ### Adjust Face Recognition Threshold
 
-Edit `client/src/patient/PatientScreen.jsx` to change matching sensitivity:
+Edit `server/routes/knownPeople.js` to change matching sensitivity:
 
 ```javascript
 const response = await api.post('/api/known-people/recognize', {

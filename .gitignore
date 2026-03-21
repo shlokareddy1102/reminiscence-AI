@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-client/node_modules/
+frontend_lovable/node_modules/
 
 # Python virtual environment
 server/python_service/venv/
@@ -11,8 +11,8 @@ __pycache__/
 .Python
 
 # Build outputs
-client/dist/
-client/build/
+frontend_lovable/dist/
+frontend_lovable/build/
 *.tsbuildinfo
 
 # Environment variables

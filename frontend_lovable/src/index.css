@@ -1,0 +1,196 @@
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+ @tailwind base;
+ @tailwind components;
+ @tailwind utilities;
+ 
+ /* Reminiscence Design System - Dementia-Friendly, Calm & Accessible */
+ 
+ @layer base {
+   :root {
+     /* Soft lavender/purple palette for calm, accessible UI */
+     --background: 260 30% 98%;
+     --foreground: 260 25% 20%;
+ 
+     --card: 260 30% 99%;
+     --card-foreground: 260 25% 20%;
+ 
+     --popover: 0 0% 100%;
+     --popover-foreground: 260 25% 20%;
+ 
+     /* Primary - Soft purple (calming) */
+     --primary: 262 60% 55%;
+     --primary-foreground: 0 0% 100%;
+ 
+     /* Secondary - Soft blue */
+     --secondary: 220 50% 94%;
+     --secondary-foreground: 220 40% 30%;
+ 
+     /* Muted - Light lavender */
+     --muted: 260 20% 94%;
+     --muted-foreground: 260 15% 45%;
+ 
+     /* Accent - Gentle blue */
+     --accent: 220 70% 60%;
+     --accent-foreground: 0 0% 100%;
+ 
+     /* Status colors - Soft, not alarming */
+     --safe: 150 45% 50%;
+     --safe-foreground: 0 0% 100%;
+     --warning: 35 80% 55%;
+     --warning-foreground: 35 90% 15%;
+     --alert: 0 60% 55%;
+     --alert-foreground: 0 0% 100%;
+ 
+     --destructive: 0 60% 55%;
+     --destructive-foreground: 0 0% 100%;
+ 
+     --border: 260 20% 88%;
+     --input: 260 20% 92%;
+     --ring: 262 60% 55%;
+ 
+     --radius: 1rem;
+ 
+     /* Sidebar - For caregiver dashboard */
+     --sidebar-background: 260 25% 97%;
+     --sidebar-foreground: 260 25% 25%;
+     --sidebar-primary: 262 60% 55%;
+     --sidebar-primary-foreground: 0 0% 100%;
+     --sidebar-accent: 260 30% 93%;
+     --sidebar-accent-foreground: 260 25% 20%;
+     --sidebar-border: 260 20% 90%;
+     --sidebar-ring: 262 60% 55%;
+ 
+     /* Custom tokens for dementia-friendly design */
+     --patient-gradient: linear-gradient(135deg, hsl(262 60% 55%) 0%, hsl(220 70% 60%) 100%);
+     --calm-shadow: 0 4px 20px -4px hsl(262 60% 55% / 0.15);
+     --gentle-shadow: 0 2px 12px -2px hsl(260 25% 20% / 0.08);
+   }
+ 
+   .dark {
+     --background: 260 25% 8%;
+     --foreground: 260 15% 95%;
+ 
+     --card: 260 25% 12%;
+     --card-foreground: 260 15% 95%;
+ 
+     --popover: 260 25% 10%;
+     --popover-foreground: 260 15% 95%;
+ 
+     --primary: 262 55% 65%;
+     --primary-foreground: 260 25% 8%;
+ 
+     --secondary: 220 30% 20%;
+     --secondary-foreground: 220 30% 90%;
+ 
+     --muted: 260 20% 18%;
+     --muted-foreground: 260 15% 65%;
+ 
+     --accent: 220 60% 55%;
+     --accent-foreground: 0 0% 100%;
+ 
+     --safe: 150 40% 45%;
+     --safe-foreground: 0 0% 100%;
+     --warning: 35 70% 50%;
+     --warning-foreground: 35 90% 10%;
+     --alert: 0 55% 50%;
+     --alert-foreground: 0 0% 100%;
+ 
+     --destructive: 0 55% 50%;
+     --destructive-foreground: 0 0% 100%;
+ 
+     --border: 260 20% 22%;
+     --input: 260 20% 20%;
+     --ring: 262 55% 65%;
+ 
+     --sidebar-background: 260 25% 10%;
+     --sidebar-foreground: 260 15% 90%;
+     --sidebar-primary: 262 55% 65%;
+     --sidebar-primary-foreground: 260 25% 8%;
+     --sidebar-accent: 260 20% 16%;
+     --sidebar-accent-foreground: 260 15% 90%;
+     --sidebar-border: 260 20% 18%;
+     --sidebar-ring: 262 55% 65%;
+   }
+ }
+ 
+ @layer base {
+   * {
+     @apply border-border;
+   }
+ 
+   html {
+     font-size: 18px;
+   }
+ 
+   body {
+     @apply bg-background text-foreground font-body antialiased;
+     line-height: 1.6;
+   }
+ 
+   h1, h2, h3, h4, h5, h6 {
+     @apply font-display font-semibold tracking-tight;
+   }
+ }
+ 
+ @layer components {
+   /* Patient-specific calm styles */
+   .patient-container {
+     @apply min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/10 p-6 md:p-8;
+   }
+ 
+   .patient-card {
+     @apply bg-card rounded-2xl shadow-calm p-6 md:p-8 border border-border/50;
+   }
+ 
+   .patient-button {
+     @apply bg-primary text-primary-foreground rounded-2xl px-8 py-5 text-xl font-semibold
+            shadow-calm hover:shadow-gentle transition-all duration-300 
+            hover:scale-[1.02] active:scale-[0.98];
+   }
+ 
+   /* Caregiver dashboard styles */
+   .caregiver-container {
+     @apply min-h-screen bg-background;
+   }
+ 
+   .status-safe {
+     @apply bg-safe/15 text-safe border-safe/30;
+   }
+ 
+   .status-warning {
+     @apply bg-warning/15 text-warning border-warning/30;
+   }
+ 
+   .status-alert {
+     @apply bg-alert/15 text-alert border-alert/30;
+   }
+ }
+ 
+ @layer utilities {
+   .shadow-calm {
+     box-shadow: var(--calm-shadow);
+   }
+ 
+   .shadow-gentle {
+     box-shadow: var(--gentle-shadow);
+   }
+ 
+   .animate-pulse-gentle {
+     animation: pulse-gentle 3s ease-in-out infinite;
+   }
+ 
+   @keyframes pulse-gentle {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.7; }
+   }
+ 
+   .animate-fade-in {
+     animation: fade-in 0.5s ease-out;
+   }
+ 
+   @keyframes fade-in {
+     from { opacity: 0; transform: translateY(8px); }
+     to { opacity: 1; transform: translateY(0); }
+   }
+ }

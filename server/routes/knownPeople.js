@@ -175,6 +175,43 @@ router.post('/rebuild-index', async (req, res) => {
   }
 });
 
+// Report unknown face detection
+router.post('/report-unknown', async (req, res) => {
+  try {
+    const { patientId, faceImage } = req.body;
+    
+    console.log('🚨 Unknown person detection received for patient:', patientId);
+    
+    if (!patientId || !faceImage) {
+      return res.status(400).json({ error: 'patientId and faceImage are required' });
+    }
+
+    const event = await Event.create({
+      patientId,
+      eventType: 'unknown_person_detected',
+      category: 'interaction',
+      riskLevel: 'MEDIUM',
+      metadata: {
+        timestamp: new Date(),
+        faceImage: faceImage
+      }
+    });
+
+    const io = req.app.get('io');
+    const room = `caregiver-${patientId}`;
+    console.log(`📡 Emitting unknownPersonDetected to room: ${room}`);
+    io.to(room).emit('unknownPersonDetected', {
+      event,
+      faceImage
+    });
+
+    res.json({ success: true, event });
+  } catch (error) {
+    console.error('✗ Error in report-unknown:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Recognize face endpoint - proxy to Python service
 router.post('/recognize', async (req, res) => {
   try {

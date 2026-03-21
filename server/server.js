@@ -13,28 +13,43 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5001;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080';
+const allowedOrigins = CLIENT_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean);
+const corsOrigin = (origin, callback) => {
+  // Allow non-browser requests and same-origin tools without an Origin header.
+  if (!origin) return callback(null, true);
+  if (allowedOrigins.includes(origin)) return callback(null, true);
+  if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+    return callback(null, true);
+  }
+  return callback(new Error('Not allowed by CORS'));
+};
 
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_ORIGIN,
+    origin: corsOrigin,
     methods: ['GET', 'POST', 'PUT']
   }
 });
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: corsOrigin }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.set('io', io);
 registerSocketHandlers(io);
 
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/patient', require('./routes/patient'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/activity', require('./routes/activity'));
 app.use('/api/known-people', require('./routes/knownPeople'));
+app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/calendar', require('./routes/calendar'));
+app.use('/api/location', require('./routes/location'));
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true });

@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const Patient = require('./models/Patient');
 const Task = require('./models/Task');
 const Event = require('./models/Event');
 const Alert = require('./models/Alert');
 const ActivityLog = require('./models/ActivityLog');
 const KnownPerson = require('./models/KnownPerson');
+const User = require('./models/User');
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/reminiscence';
 
@@ -13,6 +15,7 @@ const seedDatabase = async () => {
     await mongoose.connect(mongoUri);
 
     await Promise.all([
+      User.deleteMany({}),
       Patient.deleteMany({}),
       Task.deleteMany({}),
       Event.deleteMany({}),
@@ -21,7 +24,24 @@ const seedDatabase = async () => {
       KnownPerson.deleteMany({})
     ]);
 
+    // Create demo caregiver user
+    const caregiver = await User.create({
+      name: 'Emma Johnson',
+      email: 'caregiver@test.com',
+      password: await bcrypt.hash('password123', 10),
+      role: 'caregiver'
+    });
+
+    // Create demo patient user
+    const patientUser = await User.create({
+      name: 'Alice Johnson',
+      email: 'patient@test.com',
+      password: await bcrypt.hash('password123', 10),
+      role: 'patient'
+    });
+
     const patient = await Patient.create({
+      userId: patientUser._id,
       name: 'Alice Johnson',
       age: 74,
       riskScore: 18,
@@ -32,6 +52,10 @@ const seedDatabase = async () => {
         { name: 'Nurse Daniel', role: 'medical', priorityLevel: 2 }
       ]
     });
+
+    // Link patient to user
+    patientUser.patientId = patient._id;
+    await patientUser.save();
 
     const now = Date.now();
 
@@ -107,7 +131,12 @@ const seedDatabase = async () => {
     ]);
 
     console.log('Database seeded successfully.');
-    console.log(`Patient ID: ${patient._id}`);
+    console.log(`\n✅ Demo Credentials:\n`);
+    console.log(`Caregiver: caregiver@test.com / password123`);
+    console.log(`Patient: patient@test.com / password123`);
+    console.log(`\nCaregiver User ID: ${caregiver._id}`);
+    console.log(`Patient User ID: ${patientUser._id}`);
+    console.log(`Patient Record ID: ${patient._id}\n`);
   } catch (error) {
     console.error('Error seeding database:', error);
     process.exitCode = 1;

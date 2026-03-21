@@ -91,8 +91,8 @@ cd /path/to/reminiscence.ai
 # Install root dependencies
 npm install
 
-# Install client dependencies
-cd client
+# Install frontend dependencies
+cd frontend_lovable
 npm install
 cd ..
 ```
@@ -258,6 +258,12 @@ PYTHON_SERVICE_PORT=5002
 
 # Node.js Backend
 PORT=5001
+
+# Allowed frontend origins for CORS + Socket.io
+CLIENT_ORIGIN=http://localhost:5173,http://localhost:8080
+
+# Frontend API base URL
+VITE_API_BASE_URL=http://localhost:5001
 ```
 
 ### Adjust Recognition Threshold
@@ -269,7 +275,7 @@ PORT=5001
 threshold: 0.6  // Default L2 distance threshold for InsightFace
 ```
 
-**Frontend** (`/client/src/patient/PatientScreen.jsx`):
+**Frontend API call site** (`/frontend_lovable/src/pages/patient/PatientHome.jsx`):
 ```javascript
 const response = await api.post('/api/known-people/recognize', {
   image: imageBase64,
@@ -401,13 +407,12 @@ pip install faiss-gpu
 
 ```
 reminiscence.ai/
-├── client/                      # React frontend
+├── frontend_lovable/            # React frontend
 │   └── src/
-│       ├── patient/             # Patient dashboard
-│       │   ├── PatientScreen.jsx
-│       │   └── tracker.js       # Face tracking (SimpleTracker)
-│       └── caregiver/           # Caregiver dashboard
-│           └── CaregiverDashboard.jsx
+│       ├── pages/
+│       │   ├── patient/PatientHome.jsx
+│       │   └── caregiver/CaregiverDashboard.jsx
+│       └── lib/api.js
 ├── server/                      # Node.js backend
 │   ├── models/                  # Mongoose schemas
 │   │   ├── Patient.js
