@@ -9,9 +9,9 @@
     "server": "node server/server.js",
     "server:dev": "nodemon server/server.js",
     "seed": "node server/seed.js",
-    "client:dev": "npm --prefix frontend_lovable run dev",
-    "client:build": "npm --prefix frontend_lovable run build",
-    "client:preview": "npm --prefix frontend_lovable run preview",
+    "client:dev": "npm --prefix frontend run dev",
+    "client:build": "npm --prefix frontend run build",
+    "client:preview": "npm --prefix frontend run preview",
     "start:full": "concurrently \"npm run server\" \"npm run client:preview\"",
     "smoke": "node scripts/smoke-test.js",
     "test": "echo \"Error: no test specified\" && exit 1"

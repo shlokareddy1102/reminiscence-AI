@@ -170,17 +170,12 @@ const PatientHome = () => {
         <TimeDisplay />
       </div>
 
-      {showNotification && (
-        <NotificationBanner
-          type={notificationType}
-          message={notificationMessage}
-          onDismiss={() => setShowNotification(false)}
-        />
-      )}
-
-      <div className="flex-1 pb-1 flex flex-col md:flex-row gap-2 min-h-0 overflow-hidden">
+      <div className="flex-1 pb-1 flex flex-row items-start justify-start gap-3 min-h-0 overflow-hidden">
         {/* Left: Face Recognition Widget */}
-        <div className="w-full max-w-[18rem] md:w-[18rem] md:flex-shrink-0 flex flex-col min-h-0 self-start">
+        <div
+          className="flex-shrink-0 flex flex-col min-h-0 sticky top-2 self-start"
+          style={{ width: "42rem", maxWidth: "58vw" }}
+        >
           <PatientPersonRecognition
             patientId={patientId}
             onAnnouncement={(message) => setAssistantMessage(message)}
@@ -188,15 +183,16 @@ const PatientHome = () => {
         </div>
 
         {/* Right: Feature Panel */}
-        <div className="flex-1 min-w-0 grid grid-cols-1 xl:grid-cols-2 gap-2 min-h-0 overflow-y-auto pr-1 content-start">
-          <div className="xl:col-span-2">
-            <VoicePrompt
-              message={assistantMessage}
-              isAiGenerated={true}
-            />
-          </div>
-
-          <LocationCard location={locationLabel} isSafe={true} />
+        <div className="flex-1 min-w-0 grid grid-cols-1 gap-2 h-full overflow-y-auto pr-2 content-start">
+          {showNotification && (
+            <div>
+              <NotificationBanner
+                type={notificationType}
+                message={notificationMessage}
+                onDismiss={() => setShowNotification(false)}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <button className="patient-button w-full flex items-center justify-center gap-3 !py-3 !text-base">
@@ -206,6 +202,13 @@ const PatientHome = () => {
 
             <TaskList tasks={tasks} onToggle={handleToggleTask} />
           </div>
+
+          <LocationCard location={locationLabel} isSafe={true} />
+
+          <VoicePrompt
+            message={assistantMessage}
+            isAiGenerated={true}
+          />
         </div>
       </div>
     </PatientLayout>

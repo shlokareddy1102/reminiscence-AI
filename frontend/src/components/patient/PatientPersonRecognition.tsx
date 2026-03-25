@@ -143,7 +143,10 @@ const PatientPersonRecognition = ({ patientId, onAnnouncement }: PatientPersonRe
       {!capturedImage ? (
         <div className="flex flex-col gap-2">
           {/* Camera preview — fills available space */}
-          <div className="relative w-full aspect-square max-h-[240px] mx-auto rounded-2xl overflow-hidden bg-foreground/90">
+          <div
+            className="relative w-full aspect-square mx-auto rounded-2xl overflow-hidden bg-foreground/90"
+            style={{ maxHeight: "70vh" }}
+          >
             <video
               ref={videoRef}
               autoPlay
@@ -188,7 +191,10 @@ const PatientPersonRecognition = ({ patientId, onAnnouncement }: PatientPersonRe
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <div className="relative w-full aspect-square max-h-[240px] mx-auto rounded-2xl overflow-hidden">
+          <div
+            className="relative w-full aspect-square mx-auto rounded-2xl overflow-hidden"
+            style={{ maxHeight: "70vh" }}
+          >
             <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />
             {isAnalyzing && (
               <div className="absolute inset-0 bg-foreground/30 flex items-center justify-center">
