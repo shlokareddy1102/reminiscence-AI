@@ -14,6 +14,8 @@ const CaregiverDashboard = () => {
   const [currentState, setCurrentState] = useState("STABLE");
   const [pendingTasks, setPendingTasks] = useState(0);
   const [lastActivity, setLastActivity] = useState("-");
+  const [visitorCount, setVisitorCount] = useState("0");
+  const [averageTimeSpent, setAverageTimeSpent] = useState("0m 0s");
   const [patientId, setPatientId] = useState(null);
   const [recentAlerts, setRecentAlerts] = useState([
     {
@@ -56,6 +58,14 @@ const CaregiverDashboard = () => {
           apiRequest(`/api/tasks?patientId=${patient._id}`),
           apiRequest(`/api/alerts?patientId=${patient._id}`)
         ]);
+
+        try {
+          const overview = await apiRequest("/api/analytics/overview");
+          setVisitorCount(String(overview?.visitorCount ?? 0));
+          setAverageTimeSpent(overview?.averageTimeDisplay || "0m 0s");
+        } catch (_analyticsErr) {
+          // Ignore analytics fetch errors on dashboard load.
+        }
 
         if (Array.isArray(tasks)) {
           setPendingTasks(tasks.filter((t) => t.status === "pending").length);
@@ -167,6 +177,21 @@ const CaregiverDashboard = () => {
     };
   }, [patientId]);
 
+  useEffect(() => {
+    const refreshAnalytics = async () => {
+      try {
+        const overview = await apiRequest("/api/analytics/overview");
+        setVisitorCount(String(overview?.visitorCount ?? 0));
+        setAverageTimeSpent(overview?.averageTimeDisplay || "0m 0s");
+      } catch (_err) {
+        // Keep latest successful values if refresh fails.
+      }
+    };
+
+    const interval = setInterval(refreshAnalytics, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <CaregiverLayout>
       <div className="space-y-4">
@@ -189,10 +214,12 @@ const CaregiverDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3">
           <StatusCard title="Patient Status" value={currentState} subtitle="Live backend state" icon={Shield} status={currentState === "CRITICAL" ? "alert" : currentState === "ELEVATED_RISK" ? "warning" : "safe"} />
           <StatusCard title="Last Activity" value={lastActivity} subtitle="From patient stream" icon={Activity} status="neutral" />
           <StatusCard title="Pending Tasks" value={String(pendingTasks)} subtitle="Needs follow-up" icon={Clock} status={pendingTasks > 0 ? "warning" : "safe"} />
+          <StatusCard title="Website Visitors" value={visitorCount} subtitle="Unique visitors" icon={Activity} status="neutral" />
+          <StatusCard title="Avg Time Spent" value={averageTimeSpent} subtitle="Per visit session" icon={Clock} status="neutral" />
           <StatusCard title="AI Agent" value="Active" subtitle="Monitoring enabled" icon={Bot} status="safe" />
         </div>
 
