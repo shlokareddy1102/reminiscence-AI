@@ -593,14 +593,14 @@ By transferring cognitive responsibility from the patient to the system, the pro
 
 ### Key Achievements
 
-✅ **Full-Stack MERN Architecture**: MongoDB, Express, React, Node.js with real-time Socket.io  
-✅ **Production Face Recognition**: InsightFace (512-dim ArcFace) + FAISS vector search  
-✅ **Background Monitoring**: Automated task checking every 30 seconds  
-✅ **Risk State Machine**: Dynamic 4-state scoring (STABLE → MILD → ELEVATED → CRITICAL)  
-✅ **Real-Time Alerts**: Instant caregiver notifications via WebSocket  
-✅ **Voice Interaction**: Speech recognition for hands-free task completion  
-✅ **Multi-Face Tracking**: Stable track IDs with IoU matching  
-✅ **One-Command Setup**: Automated installation script for rapid deployment  
+- **Full-Stack MERN Architecture**: MongoDB, Express, React, Node.js with real-time Socket.io  
+- **Production Face Recognition**: InsightFace (512-dim ArcFace) + FAISS vector search  
+- **Background Monitoring**: Automated task checking every 30 seconds  
+- **Risk State Machine**: Dynamic 4-state scoring (STABLE → MILD → ELEVATED → CRITICAL)  
+- **Real-Time Alerts**: Instant caregiver notifications via WebSocket  
+- **Voice Interaction**: Speech recognition for hands-free task completion  
+- **Multi-Face Tracking**: Stable track IDs with IoU matching  
+- **One-Command Setup**: Automated installation script for rapid deployment  
 
 ### Support & Documentation
 
