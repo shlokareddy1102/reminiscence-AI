@@ -9,7 +9,7 @@
 
 ---
 
-## 🚀 Quick Start for New Users
+##  Quick Start for New Users
 
 ### Prerequisites
 Before running this project, ensure you have:
@@ -38,7 +38,7 @@ chmod +x start.sh
 ./start.sh
 ```
 
-**That's it!** 🎉 The `start.sh` script will:
+**That's it!** The `start.sh` script will:
 - Install all Node.js dependencies
 - Create a Python virtual environment
 - Install Python packages (InsightFace, FAISS, OpenCV, Flask)
